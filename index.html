@@ -91,6 +91,35 @@
         }
         .presentation-header h2 { color: white; margin-bottom: 10px; }
         .presentation-header p { color: #e0e0e0; text-align: center; margin: 0; }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .ppt-link { 
+            display: inline-block; 
+            background: #d32f2f; 
+            color: white !important; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.3s ease;
+        }
+        .ppt-link:hover {
+            background: #b71c1c;
+            text-decoration: none;
+        }
+        .ppt-link.secondary {
+            background: #0088cc;
+        }
+        .ppt-link.secondary:hover {
+            background: #006699;
+        }
 
         .table-responsive {
             width: 100%;
@@ -133,7 +162,7 @@
             height: 100%;
         }
 
-        /* ================= 3D Smart Glasses Sensor Explorer ================= */
+        /* ================= 3D Smart Glasses Sensor Explorer (unchanged) ================= */
         .g3d-intro {
             font-size: 14.5px;
             line-height: 1.7;
@@ -244,23 +273,40 @@
     <!-- 1. Professional Profile (King Tseng) -->
     <div id="resume" class="content-section">
         
-        <!-- Presentation Header -->
+        <!-- Presentation Header with PPT Links -->
         <div class="presentation-header">
             <h2>Architecting the Next-Generation of Smart Sensing & Edge AI Systems</h2>
-            <p>Aligning Deep Silicon Physics, High-Reliability Management, and Global Business Strategy for TDK InvenSense<br><br><strong>Presenter: KING TSENG (曾奕瑋) | Candidate for Technical Program Manager</strong></p>
+            <p>Aligning Deep Silicon Physics, High-Reliability Management, and Global Business Execution for TDK InvenSense<br><br><strong>Presenter: KING TSENG (曾奕瑋) | Candidate for Technical Program Manager</strong></p>
+            <div class="button-group">
+                <a href="https://drive.google.com/file/d/1jhlMzqGLOgfVj5-h4lldozVEByv8r6qR/view?usp=drivesdk" target="_blank" class="ppt-link secondary">View Simple Resume</a>
+                <a href="https://drive.google.com/file/d/1iTrDvtwjyG5E2VQ0ZQM7vYDAVtfDHCbf/view?usp=drivesdk" target="_blank" class="ppt-link">View Detailed Resume PPT</a>
+            </div>
+        </div>
+
+        <!-- Professional Profile Overview -->
+        <div class="result-card">
+            <h3>Professional Profile Overview</h3>
+            <p><strong>Mission Statement:</strong> To transition TDK InvenSense from a component supplier to a "Physical AI" system partner by bridging microscopic silicon physics with macro-level commercial execution.</p>
+            <p><strong>Key Competencies:</strong></p>
+            <ul>
+                <li><strong>Vertical Integration Expert:</strong> My background traverses the entire chip value chain—from PLL/CDR silicon tape-outs at Novatek and Orise, to system-level integration at TPK, to functional safety (ISO 26262/AEC-Q100) leadership at Foxconn.</li>
+                <li><strong>Deterministic Program Management:</strong> I reject "Trial-and-Error" engineering. I implement a 5-step Project Shield: (1) Pre-sales Physical Assessment, (2) Cross-functional Resource Alignment, (3) Architecture Optimization, (4) Strict Milestone Tracking, and (5) Post-project Risk Mitigation.</li>
+                <li><strong>Commercial Acumen:</strong> Leveraging my Wharton Business Certification, I do not merely manage "schedules." I manage ROI. I translate complex silicon metrics (e.g., PPA, Yield, SNR) into clear executive-level risk management reports that empower Tier-1 clients to make informed launch decisions.</li>
+            </ul>
+            <p><strong>Value Proposition:</strong> I provide TDK InvenSense with "Execution Certainty." When a major client encounters a technical wall, I am not just a PM who tracks the delay; I am the technical partner who identifies the Desense source, proposes the layout re-route, and rallies the R&D team to deliver a "First-time-right" silicon solution</p>
         </div>
 
         <!-- Slide 1 -->
         <div class="slide-card">
-            <h4>Slide 1: Title & Strategic Positioning</h4>
+            <h4>Slide 1: Title & Positioning</h4>
             <ul>
-                <li><strong>Slide Title:</strong> Bridging Smart-Sensor Physics with Edge AI Architecture</li>
+                <li><strong>Slide Title:</strong> Bridging Smart-Sensor Physics to the Customers</li>
                 <li><strong>Sub-title:</strong> Technical Program Management for High-Reliability MEMS & SmartEdgeML™ Ecosystems</li>
                 <li><strong>Content Outline:</strong>
                     <ul>
-                        <li>Introduction of King Tseng as a Strategic Technical Program Manager (TPM).</li>
-                        <li>Mission Statement: Transforming absolute technical depth into measurable commercial ROI for TDK InvenSense's Tier-1 global clients.</li>
-                        <li>Core Philosophy: Adhering to "Technical Project Management" to deliver first-time-right silicon through micro-to-macro cross-functional command.</li>
+                        <li>Introduction of King Tseng as a Technical Program Manager (TPM).</li>
+                        <li><strong>How could I Become a good TPM:</strong> Adhering to "Technical Project Management" to deliver first-time-right silicon through micro-to-macro cross-functional command.</li>
+                        <li><strong>Key Focus:</strong> Make the Customers Dream Come True by TDK's Chipset</li>
                     </ul>
                 </li>
             </ul>
@@ -389,7 +435,7 @@
 
         <!-- Slide 10 -->
         <div class="slide-card">
-            <h4>Slide 10: Strategic Asset 1 — Pre-Sales & RFI/RFQ Optimization</h4>
+            <h4>Slide 10: Core Asset 1 — Pre-Sales & RFI/RFQ Optimization</h4>
             <ul>
                 <li><strong>Slide Title:</strong> Preventing NRE Overruns via Precision Physical Assessments</li>
                 <li><strong>The Pain Point:</strong> Blind reliance on generic consumer-grade original datasheets ignores severe physical degradation (like electromigration and thermal stress) in extreme environments.</li>
@@ -400,7 +446,7 @@
 
         <!-- Slide 11 -->
         <div class="slide-card">
-            <h4>Slide 11: Strategic Asset 2 — Eradicating System-Level "Desense"</h4>
+            <h4>Slide 11: Core Asset 2 — Eradicating System-Level "Desense"</h4>
             <ul>
                 <li><strong>Slide Title:</strong> Cross-Talk Mitigation in High-Density Micro-Packaging</li>
                 <li><strong>The Problem:</strong> In wearable devices and smart glasses, MEMS motion sensors sit in ultra-close proximity to high-speed digital paths (DDR/USB), inducing self-jamming and sensitivity degradation (Desense).</li>
@@ -411,7 +457,7 @@
 
         <!-- Slide 12 -->
         <div class="slide-card">
-            <h4>Slide 12: Strategic Asset 3 — Architecting ISO 21434 Cybersecurity Moats</h4>
+            <h4>Slide 12: Core Asset 3 — Architecting ISO 21434 Cybersecurity Moats</h4>
             <ul>
                 <li><strong>Slide Title:</strong> Hardware-Level Anti-Spoofing and Timing Integrity</li>
                 <li><strong>The Threat:</strong> Autonomous driving systems rely heavily on untampered inertial data. Attackers target timing blocks via clock glitch attacks to paralyze systems.</li>
@@ -435,13 +481,12 @@
 
         <!-- Slide 14 -->
         <div class="slide-card">
-            <h4> Slide 14: Global Business Study (UCI) & Leadership , Strategic (Wharton & Harvard Online Class) with never giving up fighting! </h4>
+            <h4>Slide 14: Global Business Study (UCI) & Leadership, Business (Wharton & Harvard Online Class) with never giving up fighting!</h4>
             <ul>
-                <li><strong>Slide Title:</strong> Make Myself Greater Everyday </li>
-                <li><strong>The Wharton Mindset (Strategic Management Capstone):</strong> Balancing the perfectionist demands of R&D hardware design with commercial pressures (Revenue, GM, OPM) to optimize resources.</li>
+                <li><strong>Slide Title:</strong> Make myself greater everyday</li>
+                <li><strong>The Wharton Mindset (Business Management Capstone):</strong> Balancing the perfectionist demands of R&D hardware design with commercial pressures (Revenue, GM, OPM) to optimize resources.</li>
                 <li><strong>The Harvard Perspective (PredictionX Forecasting):</strong> Stepping back from granular technical details to establish predictive milestones and sign-off checklists, minimizing whole-chip revision delays.</li>
-                <li><strong> The UCI Business English:</strong> Study in California Irvine to improve my English ability and make friends 
-</li>
+                <li><strong>The UCI Business English:</strong> Study in California Irvine to improve my English ability and make friends.</li>
             </ul>
         </div>
 
@@ -505,7 +550,7 @@
         </div>
     </div>
 
-    <!-- 6. Smart Glasses Case Study (Moved to end as summary) -->
+    <!-- 6. Smart Glasses Case Study -->
     <div id="smartglasses" class="content-section">
         <div class="result-card">
             <h2>6. TDK Smart Glasses Concept: System Integration Analysis</h2>
@@ -603,7 +648,7 @@
                 <li><strong>Overcoming Desense (De-sensitivity):</strong> Packing so many powerful sensors into such a tiny space makes power noise coupling and EMI interference extreme challenges. Your past practical experience in solving Desense issues at Novatek/TPK tells the interviewer: "I know how to use clock optimization (SSC) and ground isolation to ensure that the signal quality of these micro-sensors remains perfect even in this high-density space."</li>
                 <li><strong>Energy Efficiency of Edge AI:</strong> Your background in Computing-in-Memory and low-power computing circuit design at ITRI enables you to accurately interpret why TDK chose the AISight (Edge AI) chip. You can explain to the interviewer that through your analytical capability of chip-level PPA (Power, Performance, Area), you can lead the R&D team to push the power consumption of sensing algorithms to the absolute minimum, meeting the ultra-long battery life required for the lightweight design of the glasses.</li>
             </ul>
-            <p>This analysis demonstrates that you not only understand the "physical layer principles" of the products but also possess the "system architecture integration and strategic planning" capabilities required of a TPM.</p>
+            <p>This analysis demonstrates that you not only understand the "physical layer principles" of the products but also possess the "system architecture integration and planning" capabilities required of a TPM.</p>
         </div>
     </div>
 
@@ -623,7 +668,7 @@
             <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
             
             <h3>Analysis Results</h3>
-            <p>These two documents introduce two high-performance micro-electromechanical systems (MEMS) inertial sensor products from TDK Tronics. Below is a detailed analysis of the product content, Key Features, and the factors that influence or limit these features:</p>
+            <p>These two products introduce two high-performance micro-electromechanical systems (MEMS) inertial sensor products from TDK Tronics. Below is a detailed analysis of the product content, Key Features, and the factors that influence or limit these features:</p>
             
             <h4>I. Content Analysis of the Two Products</h4>
             <ul>
@@ -632,7 +677,7 @@
             </ul>
 
             <h4>II. What is a Key Feature?</h4>
-            <p>In these technical documents, "Key features" refer to the core architecture, interface technology, and commercial advantages these sensors possess to meet high-end industrial and dynamic applications. According to the documents, they mainly include the following aspects:</p>
+            <p>In these technical products, "Key features" refer to the core architecture, interface technology, and commercial advantages these sensors possess to meet high-end industrial and dynamic applications. According to the documents, they mainly include the following aspects:</p>
             <ul>
                 <li><strong>Core Architecture Design:</strong> Both products utilize a "Closed-loop architecture", which can provide best-in-class linearity and vibration rejection capabilities.</li>
                 <li><strong>Digital Interface and Testing:</strong> Both feature a 24-bit digital SPI interface and built-in initial and continuous self-test functions.</li>
@@ -682,12 +727,12 @@
                 <li><strong>Why it goes "Hand-in-Hand" with Low-Power IoT:</strong> Unlike resistive sensors, capacitive sensors do not require a constant DC current. They only consume power when charging and discharging the micro-capacitor to take a reading. This reduces the power consumption to ultra-low levels (often around 1 to 2 µA or less). Additionally, the capacitive architecture boasts lower intrinsic noise and greater temperature stability.</li>
             </ul>
 
-            <h4>3. Strategic Value for TPM (Technical Program Manager)</h4>
+            <h4>3. Key Value for TPM (Technical Program Manager)</h4>
             <p>As a TPM at TDK, analyzing this news is crucial. It dictates our product positioning strategy. By leveraging capacitive MEMS pressure sensors, we can enable "Always-On" capabilities for our Tier-1 customers—such as centimeter-level altitude tracking in fitness bands or indoor 3D navigation in smart homes—without draining the device's battery. This perfectly aligns with my TPM philosophy of optimizing the System-level PPA (Power, Performance, Area) to deliver measurable commercial ROI.</p>
         </div>
     </div>
 
-    <!-- 9. Interactive 3D Smart Glasses Sensor Explorer -->
+    <!-- 9. Interactive 3D Smart Glasses Sensor Explorer (unchanged) -->
     <div id="glasses3d" class="content-section">
         <div class="result-card">
             <h2>9. Interactive 3D Smart Glasses Sensor Explorer</h2>
