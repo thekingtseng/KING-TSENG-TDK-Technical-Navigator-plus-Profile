@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDK Technical Expert & TPM Navigator</title>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f4f7f9; 
+            margin: 0; 
+            padding: 20px; 
+            color: #2c3e50; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+        }
+        h1 { 
+            color: #003366; 
+            font-size: 26px; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            font-weight: 700;
+        }
+        select { 
+            width: 100%; 
+            padding: 16px; 
+            font-size: 16px; 
+            border-radius: 8px; 
+            border: 2px solid #003366; 
+            background: #ffffff; 
+            margin-bottom: 30px;
+            appearance: none; 
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-weight: bold;
+            color: #003366;
+        }
+        .content-section { 
+            display: none; 
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result-card, .slide-card { 
+            padding: 30px; 
+            border-left: 6px solid #003366; 
+            background: #ffffff; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .slide-card {
+            border: 1px solid #e1e8ed;
+            padding: 25px;
+            border-left: 6px solid #d32f2f;
+        }
+        h2 { color: #003366; font-size: 22px; margin-top: 0; line-height: 1.4; }
+        h3 { color: #d32f2f; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        h4 { color: #003366; font-size: 16px; margin-bottom: 8px; }
+        
+        p, li { 
+            text-align: left; 
+            font-size: 15px; 
+            line-height: 1.7; 
+            word-wrap: break-word; 
+        }
+        ul { padding-left: 20px; margin-top: 5px; }
+        li { margin-bottom: 10px; }
+        a { color: #003366; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 15px; }
+        a:hover { text-decoration: underline; }
+        
+        .presentation-header {
+            background: #003366;
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .presentation-header h2 { color: white; margin-bottom: 10px; }
+        .presentation-header p { color: #e0e0e0; text-align: center; margin: 0; }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 650px; 
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #003366;
+            color: white;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; 
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ================= 3D Smart Glasses Sensor Explorer ================= */
+        .g3d-intro {
+            font-size: 14.5px;
+            line-height: 1.7;
+            color: #45526b;
+            margin-bottom: 18px;
+        }
+        .glasses3d-wrap {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .glasses3d-viewport {
+            flex: 1 1 420px;
+            position: relative;
+            min-height: 380px;
+            background: radial-gradient(ellipse at 50% 30%, #1c2740, #0a0e1a 80%);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #0d1b33;
+        }
+        #glasses-canvas-container { position:absolute; inset:0; }
+        #glasses-canvas-container canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+        .g3d-hint {
+            position: absolute; top: 10px; left: 10px; z-index: 5;
+            font-size: 11.5px; color: #cfe0ff; background: rgba(0,20,50,0.55);
+            padding: 5px 10px; border-radius: 6px; pointer-events:none;
+        }
+        .g3d-toolbar {
+            position: absolute; top: 10px; right: 10px; z-index: 5;
+            display:flex; gap:6px;
+        }
+        .g3d-btn {
+            width: 30px; height: 30px; border-radius: 6px; border: none;
+            background: rgba(255,255,255,0.12); color:#fff; font-weight:700; font-size:15px;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .g3d-btn:active { background: rgba(255,255,255,0.28); }
+        .g3d-caption {
+            position: absolute; bottom: 8px; left: 10px; right: 10px; z-index: 5;
+            font-size: 10.5px; color: #9fb3d1; text-align:left;
+        }
+        .glasses3d-panel {
+            flex: 1 1 320px;
+            background: #ffffff;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 18px 20px;
+            min-height: 380px;
+        }
+        .g3d-placeholder {
+            color: #8a97a8; font-size: 14px; padding-top: 30px; text-align:center;
+        }
+        .g3d-panel-eyebrow {
+            font-size: 11px; letter-spacing: 0.08em; color: #d32f2f; font-weight:700; text-transform:uppercase;
+        }
+        .g3d-panel-name { font-size: 18px; font-weight: 800; color: #003366; margin: 4px 0 2px; }
+        .g3d-panel-type { font-size: 12.5px; color: #6c7a8f; margin-bottom: 12px; }
+        .g3d-field-label {
+            font-size: 11.5px; font-weight: 700; color: #003366; text-transform: uppercase;
+            letter-spacing: 0.04em; margin-top: 12px; margin-bottom: 4px;
+        }
+        .g3d-field-value { font-size: 13.5px; line-height: 1.6; color: #34405a; }
+        #g3d-mech-canvas {
+            width: 100%; max-width: 320px; aspect-ratio: 4/3; display:block; margin-top:8px;
+            background: #0e1526; border-radius: 8px; border: 1px solid #1d2a44;
+        }
+        .g3d-step-caption {
+            margin-top: 8px; font-size: 12.5px; line-height: 1.5; color: #003366;
+            background: #eef3fa; border: 1px solid #d7e3f3; border-radius: 6px; padding: 8px 10px;
+            min-height: 38px;
+        }
+        .chip-legend {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .chip-legend button {
+            flex: 1 1 130px;
+            font-size: 12.5px; font-weight: 600; color: #003366;
+            background: #fff; border: 1.5px solid #c9d6e6; border-radius: 8px;
+            padding: 8px 6px; cursor: pointer;
+        }
+        .chip-legend button.active {
+            border-color: #d32f2f; color: #d32f2f; background: #fdeeee;
+        }
+        .chip-legend button .num {
+            display:inline-block; width:16px; height:16px; border-radius:50%;
+            background:#003366; color:#fff; font-size:10px; line-height:16px; margin-right:6px;
+        }
+        .chip-legend button.active .num { background:#d32f2f; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TDK Technical Navigator & Profile</h1>
+    <select id="navSelect" onchange="renderContent()">
+        <option value="resume">1. Professional Profile (King Tseng)</option>
+        <option value="accelerometer">2. MEMS Component: Accelerometer (Motion Sensing)</option>
+        <option value="gyroscope">3. MEMS Component: Gyroscope (Rotation Sensing)</option>
+        <option value="microphone">4. MEMS Component: MEMS Microphone (Acoustic)</option>
+        <option value="barometer">5. MEMS Component: Barometer (Pressure Sensing)</option>
+        <option value="smartglasses">6. TDK Smart Glasses Case Study (Summary & Integration)</option>
+        <option value="advance_products">7. TDK Advance Products Analysis</option>
+        <option value="news_analysis">8. Technical News Analysis</option>
+        <option value="glasses3d">9. Interactive 3D Smart Glasses Sensor Explorer</option>
+    </select>
+
+    <!-- 1. Professional Profile (King Tseng) -->
+    <div id="resume" class="content-section">
+        
+        <!-- Presentation Header -->
+        <div class="presentation-header">
+            <h2>Architecting the Next-Generation of Smart Sensing & Edge AI Systems</h2>
+            <p>Aligning Deep Silicon Physics, High-Reliability Management, and Global Business Strategy for TDK InvenSense<br><br><strong>Presenter: KING TSENG (曾奕瑋) | Candidate for Technical Program Manager</strong></p>
+        </div>
+
+        <!-- Slide 1 -->
+        <div class="slide-card">
+            <h4>Slide 1: Title & Strategic Positioning</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Bridging Smart-Sensor Physics with Edge AI Architecture</li>
+                <li><strong>Sub-title:</strong> Technical Program Management for High-Reliability MEMS & SmartEdgeML™ Ecosystems</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Introduction of King Tseng as a Strategic Technical Program Manager (TPM).</li>
+                        <li>Mission Statement: Transforming absolute technical depth into measurable commercial ROI for TDK InvenSense's Tier-1 global clients.</li>
+                        <li>Core Philosophy: Adhering to "Technical Project Management" to deliver first-time-right silicon through micro-to-macro cross-functional command.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide-card">
+            <h4>Slide 2: Executive Profile Matrix & Trajectory</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> The Micro-to-Macro Experience Trajectory</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Micro / IC Base (2010–2015): Analog IC Design, Clock Generators, High-Precision Oscillators at Orise and Novatek.</li>
+                        <li>Integration & System Modeling (2018–2022): Advanced Research (Micro-LED, Silicon Photonics) and System Modeling at ITRI and Chief Audio IP Design at ESMT.</li>
+                        <li>Macro / Automotive System (2022–2023): Technical Project Management, ISO 26262, and AEC-Q100 Compliance at Foxconn Group.</li>
+                        <li>Core Competency: A rare vertical integration perspective—native to microscopic silicon physics, fluent in macro-level OEM and Tier-1 commercial languages.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide-card">
+            <h4>Slide 3: Academic Excellence & Foundation (NTHU & NDHU)</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Rigorous Academic Heritage in Electrical Engineering</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>National Tsing Hua University (NTHU) - M.S. in Electrical Engineering (2010): Focus on Low-Power 10GHz PLL and Full-Rate 10Gbps CDR Silicon Tape-Outs. Served as Graduate Representative.</li>
+                        <li>National Dong Hwa University (NDHU) - B.S. in Electrical Engineering: Graduated 2nd in Class and appointed Member of The Phi Tau Phi Scholastic Honor Society.</li>
+                        <li>Takeaway for TDK: This deep academic foundation ensures absolute competence when communicating with InvenSense's R&D teams regarding internal high-precision system clocking and processing limitations.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="slide-card">
+            <h4>Slide 4: Early Career Triumphs — Precision Clocking & Yield (Orise)</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Foundations of Robust Design and Foundry Interactivity</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Designed high-precision internal RC oscillators and low-offset Gamma correction circuits adopted by global smartphone flagships (e.g., Sony, Samsung).</li>
+                        <li>Collaborated directly with foundry process engineers to tune design rules, maximizing circuit performance within extreme A4/die area restrictions.</li>
+                        <li>Value for InvenSense: Direct experience in managing "Process-Design Interactivity" to guarantee high mass-production yield rates across strict environmental variations.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="slide-card">
+            <h4>Slide 5: System-Level Engineering & Intellectual Property (TPK)</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Custom Controller Architectures and Global Patent Strategy</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Supervised hardware-software integration between advanced touch controllers and display modules for Tier-1 mobile/tablet customers.</li>
+                        <li>Authored and secured multiple foundational international invention patents (e.g., TW 1528240 B, TW 1628561 B) focused on physical layout noise mitigation and electrode scanning.</li>
+                        <li>Value for InvenSense: Proven ability to translate system-level field crises into robust intellectual property and clear silicon design specifications.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="slide-card">
+            <h4>Slide 6: Failure Analysis & Design-for-Reliability (Novatek)</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Post-Silicon Diagnostics and Quality Maximization</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Led post-silicon failure analysis and root-cause investigations for flagship display drivers and high-speed clock generators.</li>
+                        <li>Institutionalized robust "Design-for-Reliability (DFR)" methodologies to eliminate large current anomalies and bump resistances.</li>
+                        <li>Value for InvenSense: Drastically optimizes InvenSense's time-to-market by ensuring post-silicon validation bottlenecks are solved at the root cause, not patched at the surface.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="slide-card">
+            <h4>Slide 7: Advanced Research & Computing-in-Memory (ITRI)</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Frontier AI Architectures and Advanced Processing Simulations</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Spearheaded next-generation MRAM/RRAM Computing-in-Memory (CIM) pre-development studies, directing the full-system simulation and tape-out of CYMRAM CIM hardware.</li>
+                        <li>Engineered programmable AI hardware acceleration circuits and optimized activation function blocks.</li>
+                        <li>Value for InvenSense: Perfectly aligns with InvenSense's SmartEdgeML™ strategy, bringing concrete technical insight to optimize low-power machine learning models directly on edge sensor hardware.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="slide-card">
+            <h4>Slide 8: Audio Systems Modeling & Debugging Efficiency (ESMT)</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Behavior Modeling and Whole-Chip Architecture Optimization</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Established comprehensive behavior models for whole-chip simulation, slashing debugging cycles for high-performance Class-D digital audio amplifiers.</li>
+                        <li>Executed deep technical analysis and debugging of advanced PLL and audio signal processing loops.</li>
+                        <li>Value for InvenSense: Highly relevant for InvenSense's SmartSound™ and SmartSonic™ product lines, providing proven expertise in accelerated system debugging.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="slide-card">
+            <h4>Slide 9: High-Reliability Automotive Technical Leadership (Foxconn)</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Automotive SOC Integration and Mission Profile Execution</li>
+                <li><strong>Content Outline:</strong>
+                    <ul>
+                        <li>Conducted rigorous design reviews and technical feasibility evaluations for next-generation automotive electronic devices.</li>
+                        <li>Enforced 100% compliance with ISO 26262 functional safety (ASIL-D requirements) and severe AEC-Q100 automotive reliability standards.</li>
+                        <li>Value for InvenSense: Ready to immediately command InvenSense's SmartAutomotive™ projects, bridging technical development with strict automotive compliance.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="slide-card">
+            <h4>Slide 10: Strategic Asset 1 — Pre-Sales & RFI/RFQ Optimization</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Preventing NRE Overruns via Precision Physical Assessments</li>
+                <li><strong>The Pain Point:</strong> Blind reliance on generic consumer-grade original datasheets ignores severe physical degradation (like electromigration and thermal stress) in extreme environments.</li>
+                <li><strong>The TPM Solution:</strong> Utilizing deep hardware background to accurately calculate thermal limits, power grid robustness, and mission profiles during the pre-sales RFQ phase.</li>
+                <li><strong>Value for InvenSense:</strong> Prevents the engineering and sales teams from over-promising, accurately de-risking milestones before a single line of RTL is frozen.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 11 -->
+        <div class="slide-card">
+            <h4>Slide 11: Strategic Asset 2 — Eradicating System-Level "Desense"</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Cross-Talk Mitigation in High-Density Micro-Packaging</li>
+                <li><strong>The Problem:</strong> In wearable devices and smart glasses, MEMS motion sensors sit in ultra-close proximity to high-speed digital paths (DDR/USB), inducing self-jamming and sensitivity degradation (Desense).</li>
+                <li><strong>The TPM Solution:</strong> Applying custom noise-aware filtering algorithms, layout separation rules, and PLL Spread Spectrum Clocking (SSC) from past Novatek and TPK experience.</li>
+                <li><strong>Value for InvenSense:</strong> Drastically shortens client-side joint debugging cycles, ensuring InvenSense sensors maintain premium Signal-to-Noise Ratios (SNR) in harsh environments.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 12 -->
+        <div class="slide-card">
+            <h4>Slide 12: Strategic Asset 3 — Architecting ISO 21434 Cybersecurity Moats</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Hardware-Level Anti-Spoofing and Timing Integrity</li>
+                <li><strong>The Threat:</strong> Autonomous driving systems rely heavily on untampered inertial data. Attackers target timing blocks via clock glitch attacks to paralyze systems.</li>
+                <li><strong>The TPM Solution:</strong> Architecting hardware-grade dynamic frequency hopping utilizing advanced PLL clock recovery knowledge to sever malicious injection paths at the micro-physical layer.</li>
+                <li><strong>Value for InvenSense:</strong> Positions InvenSense as the gold standard in automotive sensor security by natively bridging product execution with ISO 21434 Cybersecurity compliance.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 13 -->
+        <div class="slide-card">
+            <h4>Slide 13: Execution Framework — The Deterministic 5-Step Project Flow</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> The TPM Action Shield: Rejecting Trial-and-Error Engineering</li>
+                <li>1. Case Analysis: Cross-referencing design rules against specifications to catch physical boundaries early.</li>
+                <li>2. Solution List: Convening cross-departmental summits to balance Cost, Time, and Risk.</li>
+                <li>3. Optimization: Conducting deep technical discussions with clients to secure optimal system ROI.</li>
+                <li>4. Resourcing: Dynamically deploying engineering tools and R&D talent to secure strict Tape-Out milestones.</li>
+                <li>5. Risk Analysis: Post-project analysis and cost-down roadmap blueprints for next-gen integration.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 14 -->
+        <div class="slide-card">
+            <h4> Slide 14: Global Business Study (UCI) & Leadership , Strategic (Wharton & Harvard Online Class) with never giving up fighting! </h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Make Myself Greater Everyday </li>
+                <li><strong>The Wharton Mindset (Strategic Management Capstone):</strong> Balancing the perfectionist demands of R&D hardware design with commercial pressures (Revenue, GM, OPM) to optimize resources.</li>
+                <li><strong>The Harvard Perspective (PredictionX Forecasting):</strong> Stepping back from granular technical details to establish predictive milestones and sign-off checklists, minimizing whole-chip revision delays.</li>
+                <li><strong> The UCI Business English:</strong> Study in California Irvine to improve my English ability and make friends 
+</li>
+            </ul>
+        </div>
+
+        <!-- Slide 15 -->
+        <div class="slide-card">
+            <h4>Slide 15: Conclusion — Why King Tseng is the Perfect Match for InvenSense</h4>
+            <ul>
+                <li><strong>Slide Title:</strong> Delivering Execution Certainty for TDK InvenSense's Future</li>
+                <li><strong>Summary of Perfect Fit:</strong>
+                    <ul>
+                        <li>Technical Depth: Fluent in the microscopic layout and clock physics that drive MEMS and Edge AI hardware.</li>
+                        <li>Management Rigor: Proven experience handling global engineering synchronization, automotive standards (ISO 26262/21434), and Tier-1 clients.</li>
+                        <li>The TPM Ultimate Promise: I don't just track schedules on a spreadsheet; I leverage chip-level insights to foresee failures, align cross-functional teams, and guarantee product delivery certainty.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 2. Accelerometer -->
+    <div id="accelerometer" class="content-section">
+        <div class="result-card">
+            <h2>2. Accelerometer (ICM Series) - Motion Sensing</h2>
+            <ul>
+                <li><strong>Physics to Electrical:</strong> MEMS accelerometers employ a "Comb-drive" capacitive architecture. The proof mass, suspended by micro-machined silicon springs, experiences inertial force F=ma when the device moves. This force displaces the mass, causing a change in the gap between interdigitated "comb fingers." These fingers act as the plates of a capacitor; as the gap (d) varies, the capacitance (C = εA/d) changes. The internal ASIC utilizes a switched-capacitor charge amplifier to convert these femto-farad scale capacitance changes into a linear voltage signal. For TDK InvenSense, managing the Spring Constant (k) is paramount to ensure sensitivity while maintaining structural integrity against shock. In professional TPM practice, we monitor Zero-g Offset and Sensitivity Error post-reflow, ensuring that thermal stress during SMT (Surface Mount Technology) does not permanently deform these micro-springs.</li>
+                <li><strong>TDK Product Hub:</strong> <a href="https://www.tronics.tdk.com/inertial-sensors/high-performance-mems-inertial-sensors/axo-high-performance-mems-accelerometers/" target="_blank">TDK MEMS Accelerometers</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 3. Gyroscope -->
+    <div id="gyroscope" class="content-section">
+        <div class="result-card">
+            <h2>3. Gyroscope (ICM Series) - Rotation Sensing</h2>
+            <ul>
+                <li><strong>Physics to Electrical:</strong> Gyroscopes operate on the Coriolis Effect. A proof mass is electrostatically driven to oscillate at high frequency (the primary mode). When the sensor rotates, the Coriolis force (Fc = 2mv × Ω) acts perpendicularly to the velocity of the oscillation, inducing a secondary vibration mode (the sense mode). This secondary displacement is capacitively detected. The signal processing chain must decouple the high-frequency drive energy from the weak sense signal. TPMs must oversee the Q-Factor of the MEMS structure—higher Q-factors improve signal-to-noise ratios but require tighter vacuum packaging control. We manage this through rigorous cross-functional alignment between packaging engineers and ASIC designers to ensure thermal-mechanical stability over the entire operating temperature range.</li>
+                <li><strong>TDK Product Hub:</strong> <a href="https://www.tronics.tdk.com/inertial-sensors/high-performance-mems-inertial-sensors/gypro-high-performance-mems-gyroscopes/" target="_blank">TDK MEMS Gyroscopes</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. Microphone -->
+    <div id="microphone" class="content-section">
+        <div class="result-card">
+            <h2>4. MEMS Microphone (T58xx Series) - Acoustic Sensing</h2>
+            <ul>
+                <li><strong>Physics to Electrical:</strong> A MEMS microphone features a thin, flexible diaphragm (often poly-silicon) suspended over a backplate. As sound waves strike the diaphragm, pressure differences induce mechanical displacement. This changes the capacitance between the diaphragm and the backplate. Because the capacitance change is minute, an internal charge pump provides a stable bias voltage to maintain the electric field. The ASIC then converts the capacitance fluctuation into a high-speed digital PDM (Pulse Density Modulation) stream. TPM oversight focuses on PSRR (Power Supply Rejection Ratio); if the power rails are noisy, the diaphragm's capacitive output will be corrupted, leading to audio artifacts. We enforce layout best practices to shield the PDM clock path from high-speed digital interferers in the system.</li>
+                <li><strong>TDK Product Hub:</strong> <a href="https://product.tdk.com/en/products/sw_piezo/mic/mems-mic/index.html" target="_blank">TDK MEMS Microphones</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 5. Barometer -->
+    <div id="barometer" class="content-section">
+        <div class="result-card">
+            <h2>5. Barometer (ICP Series) - Pressure Sensing</h2>
+            <ul>
+                <li><strong>Physics to Electrical:</strong> Pressure sensors utilize the Piezo-resistive Effect. A micro-machined silicon diaphragm is exposed to ambient pressure. As pressure changes, the diaphragm deforms (bends). Integrated resistors on the diaphragm edges experience mechanical stress, which shifts their resistance values (ΔR). These resistors are configured in a Wheatstone Bridge circuit, which translates the resistance imbalance into a differential voltage signal. A critical TPM task is managing Post-reflow Drift. Since the diaphragm is sensitive to mechanical stress, PCB warping after soldering can "pre-load" the diaphragm, causing inaccurate pressure readings. We perform pre-sales RFQ assessments to ensure customers design proper "stress-relief" zones around the sensor footprint.</li>
+                <li><strong>TDK Product Hub:</strong> <a href="https://product.tdk.com/en/products/sensor/pressure/index.html" target="_blank">TDK MEMS Pressure Sensors</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 6. Smart Glasses Case Study (Moved to end as summary) -->
+    <div id="smartglasses" class="content-section">
+        <div class="result-card">
+            <h2>6. TDK Smart Glasses Concept: System Integration Analysis</h2>
+            
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/SSRCC-1Q7fk?si=MDSPEg_IGAtGIyAv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+
+            <p>This video demonstrates how TDK InvenSense integrates multiple MEMS sensors and AI processors into the miniaturized space of "Smart Glasses." Below is a breakdown of the core chips and technical analysis featured in the video:</p>
+            
+            <h3>I. Analysis of TDK Chip Models and Applications in the Video</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Technology Type</th>
+                            <th>Usage Method</th>
+                            <th>Reason for Use (Design Value)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PositionSense™ (9-Axis IMU+TMR)</strong></td>
+                            <td>Inertial Measurement Unit + Magnetic Sensing</td>
+                            <td>Detects the absolute orientation and rotation angle of the glasses.</td>
+                            <td>Provides high-precision Head Tracking, realizing spatial positioning in virtual space.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6-Axis IMU</strong></td>
+                            <td>Inertial Measurement Unit</td>
+                            <td>Detects micro-movements of the head and image jitter.</td>
+                            <td>Combined with image stabilization technology, it ensures that images and viewing angles align instantly and smoothly when the user turns their head.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TMR Position Sensor</strong></td>
+                            <td>Tunneling Magnetoresistance Sensor</td>
+                            <td>Detects the opening and closing angle of the glasses' temples (e.g., 90 degrees, 67 degrees).</td>
+                            <td>Accurately senses the physical state of the glasses, used for power on/off or triggering specific user interfaces.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MEMS Microphones</strong></td>
+                            <td>MEMS Microphone</td>
+                            <td>Captures ambient sound and user voice.</td>
+                            <td>Used for environmental noise cancellation, voice wake-up, and voice command input (e.g., voice assistants).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ultrasonic ToF Sensors</strong></td>
+                            <td>Ultrasonic Time-of-Flight Sensor</td>
+                            <td>Detects the distance of objects ahead and hand gestures.</td>
+                            <td>Performs "gesture tracking" and "obstacle avoidance" with millisecond-level accuracy, featuring low power consumption and high penetrability.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SmartSense (AISight)</strong></td>
+                            <td>Edge AI Processor</td>
+                            <td>Processes data from various sensors.</td>
+                            <td>Localizes AI models to complete "Physical AI" judgments directly at the sensor end, eliminating the need to transmit data back to the phone via Bluetooth for computation, thereby greatly reducing power consumption.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>II. Internal Physical Conversion Mechanisms of These Sensors</h3>
+            <p>These MEMS sensors all utilize "micro-electromechanical" technology to convert external physical signals into electrical signals readable by ASIC circuits. The flow is as follows:</p>
+            <ul>
+                <li><strong>MEMS IMU (Accelerometer/Gyroscope):</strong>
+                    <ul>
+                        <li><strong>Physical to Electrical Signal:</strong> Internally, there is a silicon "Proof Mass" supported by springs.</li>
+                        <li><strong>Mechanism:</strong> When the head turns, the proof mass displaces due to inertia, changing the "Capacitance gap" between it and the fixed comb fingers. By detecting this minute capacitance change, the circuit outputs digitized acceleration and angular velocity data.</li>
+                    </ul>
+                </li>
+                <li><strong>TMR Position Sensor (Magnetoresistance):</strong>
+                    <ul>
+                        <li><strong>Physical to Electrical Signal:</strong> Utilizes the "Tunnel Magnetoresistance" effect.</li>
+                        <li><strong>Mechanism:</strong> The sensor contains ferromagnetic layers and an insulating tunnel layer. When the external magnetic field (a magnet at the hinge of the glasses) changes angle, the resistance of the tunneling electrons flowing through the film changes significantly, thereby outputting a precise voltage value for the rotation angle.</li>
+                    </ul>
+                </li>
+                <li><strong>MEMS Microphone:</strong>
+                    <ul>
+                        <li><strong>Physical to Electrical Signal:</strong> A variable capacitor formed by a "Diaphragm" and a "Backplate."</li>
+                        <li><strong>Mechanism:</strong> Sound waves push the diaphragm to vibrate, changing the distance to the backplate, which modulates the capacitance value. The internal ASIC then converts this into a digital PCM audio format.</li>
+                    </ul>
+                </li>
+                <li><strong>Ultrasonic ToF (Ultrasound):</strong>
+                    <ul>
+                        <li><strong>Physical to Electrical Signal:</strong> "Piezoelectric Effect."</li>
+                        <li><strong>Mechanism:</strong> Emitting a voltage pulse causes the piezoelectric diaphragm to vibrate and emit ultrasound. When the sound waves reflect back, the pressure causes the diaphragm to undergo mechanical deformation again, converting this mechanical pressure back into a voltage signal via the piezoelectric material. By calculating the time difference from "emission to reception," the object's distance is accurately determined.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>III. The TPM's Technical Strategic Insight (Why you must mention this in the interview)</h3>
+            <p>As a candidate applying for the TDK InvenSense TPM role, when observing this video, beyond the technical principles, you should emphasize how you apply your "System Integration" experience to solve the engineering challenges within:</p>
+            <ul>
+                <li><strong>Overcoming Desense (De-sensitivity):</strong> Packing so many powerful sensors into such a tiny space makes power noise coupling and EMI interference extreme challenges. Your past practical experience in solving Desense issues at Novatek/TPK tells the interviewer: "I know how to use clock optimization (SSC) and ground isolation to ensure that the signal quality of these micro-sensors remains perfect even in this high-density space."</li>
+                <li><strong>Energy Efficiency of Edge AI:</strong> Your background in Computing-in-Memory and low-power computing circuit design at ITRI enables you to accurately interpret why TDK chose the AISight (Edge AI) chip. You can explain to the interviewer that through your analytical capability of chip-level PPA (Power, Performance, Area), you can lead the R&D team to push the power consumption of sensing algorithms to the absolute minimum, meeting the ultra-long battery life required for the lightweight design of the glasses.</li>
+            </ul>
+            <p>This analysis demonstrates that you not only understand the "physical layer principles" of the products but also possess the "system architecture integration and strategic planning" capabilities required of a TPM.</p>
+        </div>
+    </div>
+
+    <!-- 7. TDK Advance Products Analysis -->
+    <div id="advance_products" class="content-section">
+        <div class="result-card">
+            <h2>7. TDK Advance Products Analysis</h2>
+            
+            <h3>High performance digital MEMS accelerometers</h3>
+            <h4>Closed loop acceleration and angular rate sensors</h4>
+            <a href="https://www.tronics.tdk.com/inertial-sensors/high-performance-mems-inertial-sensors/axo-high-performance-mems-accelerometers/" target="_blank">View TDK MEMS Accelerometers</a>
+            
+            <h3>High stability digital MEMS gyros</h3>
+            <h4>Find out distributors for our high accuracy MEMS inertial sensors</h4>
+            <a href="https://www.tronics.tdk.com/inertial-sensors/high-performance-mems-inertial-sensors/gypro-high-performance-mems-gyroscopes/" target="_blank">View TDK MEMS Gyros</a>
+            
+            <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <h3>Analysis Results</h3>
+            <p>These two documents introduce two high-performance micro-electromechanical systems (MEMS) inertial sensor products from TDK Tronics. Below is a detailed analysis of the product content, Key Features, and the factors that influence or limit these features:</p>
+            
+            <h4>I. Content Analysis of the Two Products</h4>
+            <ul>
+                <li><strong>TDK MEMS Accelerometers:</strong> Primarily introduces the AXO®300 series. This is a high-performance closed-loop digital MEMS accelerometer in an SMD package. This product is designed for harsh environments and is suitable for dynamic application systems such as Inertial Measurement Units (IMU) and Motion Reference Units (MRU).</li>
+                <li><strong>TDK MEMS Gyros:</strong> Primarily introduces the GYPRO® series. This is a high-stability closed-loop digital MEMS gyroscope, also in an SMD package. This product provides excellent bias stability and Angular Random Walk (ARW), making it suitable for precise attitude control and navigation systems.</li>
+            </ul>
+
+            <h4>II. What is a Key Feature?</h4>
+            <p>In these technical documents, "Key features" refer to the core architecture, interface technology, and commercial advantages these sensors possess to meet high-end industrial and dynamic applications. According to the documents, they mainly include the following aspects:</p>
+            <ul>
+                <li><strong>Core Architecture Design:</strong> Both products utilize a "Closed-loop architecture", which can provide best-in-class linearity and vibration rejection capabilities.</li>
+                <li><strong>Digital Interface and Testing:</strong> Both feature a 24-bit digital SPI interface and built-in initial and continuous self-test functions.</li>
+                <li><strong>Packaging Technology:</strong> Both adopt a hermetic ceramic SMD package.</li>
+                <li><strong>Product-Specific Features:</strong>
+                    <ul>
+                        <li>AXO®300 (Accelerometer) is a single-axis in-plane sensing device, with an input range from ±1 g to ±14 g.</li>
+                        <li>GYPRO® (Gyroscope) is a 1-axis yaw rate (Z-axis) sensing device, featuring hard-coded electronics (no software), and is factory-calibrated.</li>
+                    </ul>
+                </li>
+                <li><strong>Export Regulations:</strong> Neither is classified under dual-use export control.</li>
+            </ul>
+
+            <h4>III. When and what influences or limits these Key Features? (Including SWaP-C detailed mechanism)</h4>
+            <p>The functional features and architecture of these sensors are precisely designed to solve the limitations encountered by traditional sensors in specific application environments. The main factors influencing and limiting sensor applications are as follows:</p>
+            <ul>
+                <li><strong>Harsh Physical Environments (Vibration and Temperature Variations):</strong> General open-loop MEMS sensors often perform poorly under harsh conditions. To solve this limitation, these two products have a built-in "force-rebalance architecture" (closed-loop), making them extremely insensitive to vibrations and linear accelerations.</li>
+                <li><strong>Cost of System-Level Temperature Modeling:</strong> During system integration, complex temperature compensation and modeling typically consume massive resources and limit development speed. This limitation is eliminated through "factory-calibration", allowing the system side to skip expensive and complex temperature modeling.</li>
+                <li><strong>SWaP-C Limitations (Size, Weight, Power, and Cost):</strong> 
+                    <br><em>*Detailed Mechanism of SWaP-C:</em> SWaP-C is the abbreviation for <strong>Size, Weight, Power, and Cost</strong>. In traditional high-performance sensing applications, bulky and expensive Quartz accelerometers, Fiber Optic Gyros (FOG), or Dynamically Tuned Gyros (DTG) are typically used. The limitation of these traditional technologies lies in their bulky form factor and high price. TDK's solution overcomes this by utilizing advanced micro-machining processes to scale down macroscopic mechanical sensing structures onto microscopic silicon wafers. By housing these MEMS structures in miniature hermetic SMD packages, the physical footprint (Size and Weight), energy consumption (Power), and manufacturing expense (Cost) are drastically reduced. This breakthrough breaks traditional limitations, providing an ideal low-SWaP-C alternative without sacrificing tactical-grade accuracy.</li>
+                <li><strong>Integration Time Limitations:</strong> Traditional analog sensors require longer system integration times. Through the 24-bit SPI digital interface and continuous self-test functions, the speed of integrating the sensor into the system is significantly accelerated.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 8. Technical News Analysis -->
+    <div id="news_analysis" class="content-section">
+        <div class="result-card">
+            <h2>8. Technical News Analysis</h2>
+            <h3>Explore TDK's new product and discuss both capacitive and resistive MEMS pressure-sensing technology</h3>
+            <a href="https://www.allaboutcircuits.com/news/tdk-sensor-shows-how-capacitive-mems-low-power-iot-hand-in-hand/" target="_blank">Read Full Article on All About Circuits</a>
+            
+            <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <h3>Article Analysis & Technological Comparison</h3>
+            <p>This technical news highlights TDK InvenSense's architectural transition and superiority in MEMS pressure-sensing technologies, specifically contrasting traditional Piezoresistive methods with advanced Capacitive MEMS solutions for the rapidly growing low-power IoT (Internet of Things) market.</p>
+            
+            <h4>1. Piezoresistive MEMS Technology (The Traditional Approach)</h4>
+            <ul>
+                <li><strong>Physical Mechanism:</strong> Piezoresistive sensors utilize a micro-machined silicon diaphragm implanted with strain-sensitive resistors (piezoresistors), usually arranged in a Wheatstone Bridge configuration. When ambient pressure changes, the diaphragm bends, causing mechanical stress that alters the resistance values.</li>
+                <li><strong>Limitations in IoT:</strong> To detect these resistance changes, a continuous DC bias current must flow through the Wheatstone Bridge. This continuous current draw typically consumes tens to hundreds of microamps (µA), which severely limits the battery life of miniaturized IoT devices and wearables. Furthermore, piezoresistive elements are highly sensitive to temperature fluctuations, requiring complex calibration.</li>
+            </ul>
+
+            <h4>2. Capacitive MEMS Technology (TDK's Innovation)</h4>
+            <ul>
+                <li><strong>Physical Mechanism:</strong> Capacitive pressure sensors consist of a flexible, conductive diaphragm and a fixed backplate separated by a microscopic gap, forming a variable capacitor (C = εA / d). Changes in atmospheric pressure cause the diaphragm to deflect, altering the gap distance (d) and thereby changing the capacitance.</li>
+                <li><strong>Why it goes "Hand-in-Hand" with Low-Power IoT:</strong> Unlike resistive sensors, capacitive sensors do not require a constant DC current. They only consume power when charging and discharging the micro-capacitor to take a reading. This reduces the power consumption to ultra-low levels (often around 1 to 2 µA or less). Additionally, the capacitive architecture boasts lower intrinsic noise and greater temperature stability.</li>
+            </ul>
+
+            <h4>3. Strategic Value for TPM (Technical Program Manager)</h4>
+            <p>As a TPM at TDK, analyzing this news is crucial. It dictates our product positioning strategy. By leveraging capacitive MEMS pressure sensors, we can enable "Always-On" capabilities for our Tier-1 customers—such as centimeter-level altitude tracking in fitness bands or indoor 3D navigation in smart homes—without draining the device's battery. This perfectly aligns with my TPM philosophy of optimizing the System-level PPA (Power, Performance, Area) to deliver measurable commercial ROI.</p>
+        </div>
+    </div>
+
+    <!-- 9. Interactive 3D Smart Glasses Sensor Explorer -->
+    <div id="glasses3d" class="content-section">
+        <div class="result-card">
+            <h2>9. Interactive 3D Smart Glasses Sensor Explorer</h2>
+            <p class="g3d-intro">A 3D, rotatable model of the smart glasses referenced in the case study video. Drag to rotate, scroll or pinch to zoom, and click any highlighted sensor to see its physical-to-electrical conversion mechanism animated, alongside the technical role each chip plays in the system.</p>
+
+            <div class="glasses3d-wrap">
+                <div class="glasses3d-viewport">
+                    <div id="glasses-canvas-container"></div>
+                    <div class="g3d-hint">Drag to rotate · Scroll / pinch to zoom</div>
+                    <div class="g3d-toolbar">
+                        <button class="g3d-btn" id="g3d-zoom-in">+</button>
+                        <button class="g3d-btn" id="g3d-zoom-out">−</button>
+                        <button class="g3d-btn" id="g3d-reset" style="width:auto; padding:0 8px; font-size:11px;">Reset</button>
+                    </div>
+                    <div class="g3d-caption">Illustrative 3D model — sensor placements approximate those shown in the reference case-study video (not an exact teardown).</div>
+                </div>
+                <div class="glasses3d-panel" id="glasses-panel">
+                    <div class="g3d-placeholder">Select a highlighted sensor on the glasses (or from the list below) to view its role and physical-to-electrical mechanism.</div>
+                </div>
+            </div>
+
+            <div class="chip-legend" id="chip-legend"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const sections = ['resume', 'accelerometer', 'gyroscope', 'microphone', 'barometer', 'smartglasses', 'advance_products', 'news_analysis', 'glasses3d'];
+
+    function renderContent() {
+        const selectedValue = document.getElementById('navSelect').value;
+        
+        // Hide all sections first
+        sections.forEach(id => {
+            document.getElementById(id).style.display = 'none';
+        });
+
+        // Show the selected section
+        if (selectedValue) {
+            document.getElementById(selectedValue).style.display = 'block';
+        }
+
+        if (selectedValue === 'glasses3d' && window.initGlassesScene) {
+            requestAnimationFrame(() => window.initGlassesScene());
+        }
+    }
+
+    // Initialize the page by showing the first option (Resume)
+    window.onload = function() {
+        document.getElementById('navSelect').value = 'resume';
+        renderContent();
+    };
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ============ Sensor data (mirrors Section 6 table & mechanism text) ============ */
+const GLASS_CHIPS = [
+  {
+    id: 'positionsense',
+    num: 1,
+    name: 'PositionSense™ (9-Axis IMU+TMR)',
+    type: 'Inertial Measurement Unit + Magnetic Sensing',
+    usage: 'Detects the absolute orientation and rotation angle of the glasses.',
+    value: 'Provides high-precision Head Tracking, realizing spatial positioning in virtual space.',
+    mechanism: 'Combines a capacitive 6-axis IMU with a TMR magnetometer. The IMU senses linear motion and rotation via proof-mass displacement, while the TMR sensor reads absolute heading from the ambient magnetic field for drift-free orientation.',
+    steps: [
+      'The IMU proof mass responds to motion; comb-finger capacitance shifts accordingly',
+      'The TMR magnetometer simultaneously senses the ambient magnetic field direction',
+      'Sensor fusion combines both signals into a stable, drift-free 9-axis absolute orientation'
+    ],
+    position: [1.95, 0.05, -0.55],
+    color: 0x2a6fdb,
+    drawer: 'imu'
+  },
+  {
+    id: 'imu6',
+    num: 2,
+    name: '6-Axis IMU',
+    type: 'Inertial Measurement Unit',
+    usage: 'Detects micro-movements of the head and image jitter.',
+    value: 'Combined with image stabilization technology, ensures images and viewing angle align instantly and smoothly when the user turns their head.',
+    mechanism: 'A silicon Proof Mass suspended by springs. Motion displaces the mass due to inertia, changing the capacitance gap between it and fixed comb fingers. This minute capacitance change is converted into digitized acceleration and angular velocity data.',
+    steps: [
+      'Head motion generates inertial force on the spring-suspended proof mass',
+      'Mass displacement changes the comb-finger capacitor gap',
+      'A capacitance-to-voltage circuit outputs digitized acceleration / angular velocity data'
+    ],
+    position: [-1.95, 0.05, -0.55],
+    color: 0x2a6fdb,
+    drawer: 'imu'
+  },
+  {
+    id: 'tmr',
+    num: 3,
+    name: 'TMR Position Sensor',
+    type: 'Tunneling Magnetoresistance Sensor',
+    usage: "Detects the opening and closing angle of the glasses' temples (e.g., 90°, 67°).",
+    value: 'Accurately senses the physical state of the glasses, used for power on/off or triggering specific user interfaces.',
+    mechanism: 'Tunneling Magnetoresistance effect. Ferromagnetic layers are separated by an insulating tunnel layer. As the external hinge magnet changes angle, the resistance of tunneling electrons through the film changes significantly, outputting a precise voltage value for rotation angle.',
+    steps: [
+      'A small magnet embedded in the hinge rotates as the temple opens or closes',
+      'The changing field angle alters spin alignment across the insulating tunnel barrier',
+      'Tunneling resistance shifts accordingly, producing a precise voltage readout of hinge angle'
+    ],
+    position: [1.78, -0.05, 0.30],
+    color: 0xd32f2f,
+    drawer: 'tmr'
+  },
+  {
+    id: 'mic',
+    num: 4,
+    name: 'MEMS Microphones',
+    type: 'MEMS Microphone',
+    usage: 'Captures ambient sound and user voice.',
+    value: 'Used for environmental noise cancellation, voice wake-up, and voice command input (e.g., voice assistants).',
+    mechanism: 'A variable capacitor formed by a Diaphragm and a Backplate. Sound waves push the diaphragm to vibrate, changing the distance to the backplate, which modulates the capacitance value. The internal ASIC then converts this into a digital PCM audio format.',
+    steps: [
+      'Sound pressure waves strike the flexible diaphragm, causing it to vibrate',
+      'The diaphragm-to-backplate gap changes, modulating capacitance in real time',
+      'The on-chip ASIC converts the capacitance change into a digital PDM / PCM audio stream'
+    ],
+    position: [0, 0.40, 0.55],
+    color: 0x2a6fdb,
+    drawer: 'mic'
+  },
+  {
+    id: 'tof',
+    num: 5,
+    name: 'Ultrasonic ToF Sensors',
+    type: 'Ultrasonic Time-of-Flight Sensor',
+    usage: 'Detects the distance of objects ahead and hand gestures.',
+    value: 'Performs gesture tracking and obstacle avoidance with millisecond-level accuracy, low power consumption and high penetrability.',
+    mechanism: 'Piezoelectric Effect. A voltage pulse causes the piezoelectric diaphragm to vibrate and emit ultrasound. When the sound waves reflect back, the pressure causes the diaphragm to deform again, converting mechanical pressure back into a voltage signal. The time difference from emission to reception determines the distance.',
+    steps: [
+      'A voltage pulse drives the piezoelectric diaphragm to emit an ultrasonic pulse',
+      'The pulse travels outward, reflects off a nearby object, and returns',
+      'The returning pressure wave deforms the diaphragm, generating a voltage spike — time-of-flight converts directly into distance'
+    ],
+    position: [-1.78, 0.10, 0.46],
+    color: 0xd32f2f,
+    drawer: 'tof'
+  },
+  {
+    id: 'aisight',
+    num: 6,
+    name: 'SmartSense (AISight)',
+    type: 'Edge AI Processor',
+    usage: 'Processes data from various sensors.',
+    value: 'Localizes AI models to complete "Physical AI" judgments directly at the sensor end, eliminating the need to transmit data back to the phone via Bluetooth for computation, thereby greatly reducing power consumption.',
+    mechanism: 'Not a physical-to-electrical transducer, but an on-chip processing element. Raw sensor streams (IMU, TMR, microphone, ToF) are fused and run through small neural-network / DSP blocks locally, producing decisions or gesture events on-chip instead of streaming raw data off-device.',
+    steps: [
+      'Sensor streams from the IMU, TMR, microphone and ToF sensor converge at the edge AI processor',
+      'On-chip inference (small NN / DSP blocks) fuses and classifies the data locally',
+      'A compact decision / event is output directly — no raw-data round trip to a paired phone, saving power'
+    ],
+    position: [2.35, 0.02, -1.05],
+    color: 0x2a6fdb,
+    drawer: 'ai'
+  }
+];
+
+let initialized = false;
+let scene, camera, renderer, controls, container;
+let raycaster, pointer;
+let chipMarkers = [];
+let currentChipId = null;
+let mechRAF = null, mechStepTimer = null;
+let downPos = null, downTime = 0;
+
+const HOME_POS = new THREE.Vector3(0, 1.05, 4.2);
+const HOME_TARGET = new THREE.Vector3(0, 0.05, -0.1);
+
+function buildGlassesModel() {
+  const group = new THREE.Group();
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x161616, roughness: 0.55, metalness: 0.2 });
+  const lensMat = new THREE.MeshPhysicalMaterial({ color: 0x1b2530, transmission: 0.35, roughness: 0.2, metalness: 0.25, transparent: true, opacity: 0.82 });
+
+  // Lens rings
+  [-0.95, 0.95].forEach(x => {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.44, 0.055, 16, 40), frameMat);
+    ring.position.set(x, 0, 0.55);
+    ring.castShadow = true;
+    group.add(ring);
+    const lens = new THREE.Mesh(new THREE.CircleGeometry(0.42, 40), lensMat);
+    lens.position.set(x, 0, 0.53);
+    group.add(lens);
+  });
+
+  // Bridge
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.07, 0.09), frameMat);
+  bridge.position.set(0, -0.02, 0.58);
+  group.add(bridge);
+
+  // Brow bar (top accent)
+  const brow = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.05, 0.05), frameMat);
+  brow.position.set(0, 0.42, 0.56);
+  group.add(brow);
+
+  // Hinges
+  [-1.75, 1.75].forEach(x => {
+    const hinge = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 0.14), frameMat);
+    hinge.position.set(x, 0, 0.42);
+    group.add(hinge);
+  });
+
+  // Temple arms
+  [-1, 1].forEach(dir => {
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.06, 1.7), frameMat);
+    arm.position.set(dir * 1.95, -0.01, -0.45);
+    arm.rotation.y = dir * 0.09;
+    arm.castShadow = true;
+    group.add(arm);
+  });
+
+  return group;
+}
+
+function makeLabelSprite(text, color) {
+  const c = document.createElement('canvas');
+  c.width = 96; c.height = 96;
+  const ctx = c.getContext('2d');
+  ctx.beginPath();
+  ctx.arc(48, 48, 40, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(10,15,30,0.85)';
+  ctx.fill();
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = '#ffffff';
+  ctx.stroke();
+  ctx.font = '700 42px -apple-system, Arial, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 48, 52);
+  const tex = new THREE.CanvasTexture(c);
+  const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.28, 0.28, 1);
+  return sprite;
+}
+
+function buildMarkers() {
+  GLASS_CHIPS.forEach(cfg => {
+    const group = new THREE.Group();
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.055, 20, 20),
+      new THREE.MeshStandardMaterial({ color: cfg.color, emissive: cfg.color, emissiveIntensity: 0.7 })
+    );
+    group.add(dot);
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(0.09, 0.012, 12, 32),
+      new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: 0.7 })
+    );
+    group.add(ring);
+    const label = makeLabelSprite(String(cfg.num), cfg.color);
+    label.position.set(0, 0.16, 0);
+    group.add(label);
+
+    group.position.set(...cfg.position);
+    group.userData.cfg = cfg;
+    group.userData.dot = dot;
+    scene.add(group);
+    chipMarkers.push(group);
+  });
+}
+
+function findChip(obj) {
+  let o = obj;
+  while (o) {
+    if (o.userData && o.userData.cfg) return o;
+    o = o.parent;
+  }
+  return null;
+}
+
+function flyTo(pos, target, duration = 800) {
+  controls.enabled = false;
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+  const t0 = performance.now();
+  function step(now) {
+    const t = Math.min(1, (now - t0) / duration);
+    const e = 1 - Math.pow(1 - t, 3);
+    camera.position.lerpVectors(startPos, pos, e);
+    controls.target.lerpVectors(startTarget, target, e);
+    controls.update();
+    if (t < 1) requestAnimationFrame(step);
+    else controls.enabled = true;
+  }
+  requestAnimationFrame(step);
+}
+
+function focusMarker(markerGroup) {
+  const p = markerGroup.position;
+  const dir = new THREE.Vector3(p.x, 0, p.z + 1).normalize();
+  const camPos = new THREE.Vector3(p.x + dir.x * 1.3, p.y + 0.35, p.z + dir.z * 1.3 + 0.4);
+  flyTo(camPos, new THREE.Vector3(p.x, p.y, p.z));
+}
+
+function goHome() {
+  flyTo(HOME_POS, HOME_TARGET);
+}
+
+/* ---------------- Panel rendering ---------------- */
+function renderPanel(cfg) {
+  const panel = document.getElementById('glasses-panel');
+  panel.innerHTML = `
+    <div class="g3d-panel-eyebrow">Sensor ${cfg.num} of 6</div>
+    <div class="g3d-panel-name">${cfg.name}</div>
+    <div class="g3d-panel-type">${cfg.type}</div>
+
+    <div class="g3d-field-label">Usage Method</div>
+    <div class="g3d-field-value">${cfg.usage}</div>
+
+    <div class="g3d-field-label">Reason for Use (Design Value)</div>
+    <div class="g3d-field-value">${cfg.value}</div>
+
+    <div class="g3d-field-label">Physical → Electrical Mechanism</div>
+    <div class="g3d-field-value">${cfg.mechanism}</div>
+
+    <canvas id="g3d-mech-canvas" width="320" height="240"></canvas>
+    <div class="g3d-step-caption"><span id="g3d-step-index" style="color:#d32f2f; font-weight:800; margin-right:6px;">1</span><span id="g3d-step-text"></span></div>
+  `;
+  startMechAnimation(cfg);
+}
+
+function updateLegendActive(id) {
+  document.querySelectorAll('.chip-legend button').forEach(b => {
+    b.classList.toggle('active', b.dataset.id === id);
+  });
+}
+
+function selectChip(id, doFly) {
+  currentChipId = id;
+  const cfg = GLASS_CHIPS.find(c => c.id === id);
+  const marker = chipMarkers.find(m => m.userData.cfg.id === id);
+  updateLegendActive(id);
+  renderPanel(cfg);
+  if (doFly && marker) focusMarker(marker);
+}
+
+/* ---------------- Legend buttons ---------------- */
+function buildLegend() {
+  const legend = document.getElementById('chip-legend');
+  legend.innerHTML = '';
+  GLASS_CHIPS.forEach(cfg => {
+    const btn = document.createElement('button');
+    btn.dataset.id = cfg.id;
+    btn.innerHTML = `<span class="num">${cfg.num}</span>${cfg.name}`;
+    btn.addEventListener('click', () => selectChip(cfg.id, true));
+    legend.appendChild(btn);
+  });
+}
+
+/* ---------------- Mechanism canvas animations ---------------- */
+const GOLD = '#ffcf5c';
+function drawLED(ctx, x, y, r, on, color) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = on ? (color || '#7dd3fc') : '#293449';
+  ctx.shadowColor = color || '#7dd3fc';
+  ctx.shadowBlur = on ? 18 : 0;
+  ctx.fill();
+  ctx.lineWidth = 2; ctx.strokeStyle = '#4a5878'; ctx.stroke();
+  ctx.restore();
+}
+function drawWire(ctx, pts, color) {
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.strokeStyle = color || 'rgba(255,255,255,0.35)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function drawIMU(ctx, w, h, t) {
+  ctx.clearRect(0, 0, w, h);
+  const cy = h * 0.55;
+  const massW = 70, massH = 46;
+  const disp = Math.sin(t * 2.4) * 20;
+  const massX = w * 0.4 + disp;
+
+  // springs
+  ctx.strokeStyle = '#5b6b90'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  const springStartX = w * 0.14;
+  const coils = 6;
+  for (let i = 0; i <= coils; i++) {
+    const x = springStartX + (i / coils) * (massX - massW / 2 - springStartX);
+    const y = cy + (i % 2 === 0 ? -10 : 10);
+    if (i === 0) ctx.moveTo(x, cy); else ctx.lineTo(x, y);
+  }
+  ctx.lineTo(massX - massW / 2, cy);
+  ctx.stroke();
+
+  // anchor
+  ctx.fillStyle = '#33415f';
+  ctx.fillRect(w * 0.08, cy - 40, 16, 80);
+
+  // proof mass
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(massX - massW / 2, cy - massH / 2, massW, massH);
+
+  // comb fingers (fixed, right side)
+  ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 3;
+  const fixedX = w * 0.72;
+  for (let i = 0; i < 4; i++) {
+    const y = cy - 45 + i * 30;
+    ctx.beginPath(); ctx.moveTo(fixedX, y); ctx.lineTo(fixedX - 34, y); ctx.stroke();
+  }
+  // moving fingers (attached to mass)
+  ctx.strokeStyle = GOLD;
+  for (let i = 0; i < 4; i++) {
+    const y = cy - 30 + i * 30;
+    ctx.beginPath(); ctx.moveTo(massX + massW / 2, y); ctx.lineTo(massX + massW / 2 + 30, y); ctx.stroke();
+  }
+
+  const gap = 34 + disp;
+  ctx.font = '600 13px sans-serif'; ctx.fillStyle = '#cfe0ff'; ctx.textAlign = 'center';
+  ctx.fillText('capacitor gap Δd', (massX + fixedX) / 2, cy + 60);
+
+  const ledX = w * 0.88, ledY = h * 0.22;
+  drawWire(ctx, [[fixedX, cy], [w * 0.82, h * 0.3], [ledX, ledY]], 'rgba(125,211,252,0.5)');
+  drawLED(ctx, ledX, ledY, 14, Math.abs(disp) > 8, '#7dd3fc');
+
+  ctx.textAlign = 'left'; ctx.fillStyle = '#cfe0ff';
+  ctx.fillText('proof mass', w * 0.06, cy - 50);
+}
+
+function drawTMR(ctx, w, h, t) {
+  ctx.clearRect(0, 0, w, h);
+  const cx = w * 0.42, cy = h * 0.5;
+  const angle = (Math.sin(t * 1.4) * 0.5 + 0.5) * 100; // 0-100 deg range
+
+  // fixed layer arrow
+  ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(cx - 60, cy + 45); ctx.lineTo(cx + 60, cy + 45); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx + 60, cy + 45); ctx.lineTo(cx + 46, cy + 37); ctx.moveTo(cx + 60, cy + 45); ctx.lineTo(cx + 46, cy + 53); ctx.stroke();
+
+  // insulating barrier
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillRect(cx - 70, cy - 6, 140, 12);
+
+  // free layer arrow rotating
+  const rad = (angle) * Math.PI / 180;
+  ctx.save();
+  ctx.translate(cx, cy - 45);
+  ctx.rotate(-rad / 3);
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.moveTo(-60, 0); ctx.lineTo(60, 0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(60, 0); ctx.lineTo(46, -8); ctx.moveTo(60, 0); ctx.lineTo(46, 8); ctx.stroke();
+  ctx.restore();
+
+  // tunneling electrons
+  const alignment = Math.cos(rad / 3); // 1 = parallel (low R), -1 = antiparallel (high R)
+  const density = Math.max(1, Math.round(6 * (alignment * 0.5 + 0.5)) + 1);
+  ctx.fillStyle = '#ffe9a8';
+  for (let i = 0; i < density; i++) {
+    const x = cx - 50 + (i / Math.max(1,density-1)) * 100;
+    const y = cy + ((t * 60 + i * 17) % 20) - 10;
+    ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI * 2); ctx.fill();
+  }
+
+  const resistance = Math.round(1000 + (1 - (alignment * 0.5 + 0.5)) * 4000);
+  ctx.font = '700 16px sans-serif'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  ctx.fillText('R ≈ ' + resistance + ' Ω', cx, cy + 90);
+  ctx.font = '600 13px sans-serif'; ctx.fillStyle = '#cfe0ff';
+  ctx.fillText('hinge angle ≈ ' + Math.round(angle) + '°', cx, cy - 90);
+
+  const ledX = w * 0.86, ledY = h * 0.24;
+  drawWire(ctx, [[cx + 70, cy], [w * 0.78, h * 0.32], [ledX, ledY]], 'rgba(255,158,158,0.5)');
+  drawLED(ctx, ledX, ledY, 14, alignment > 0.2, '#ff8a8a');
+}
+
+function drawMic(ctx, w, h, t) {
+  ctx.clearRect(0, 0, w, h);
+  const cx = w * 0.34, cy = h * 0.5;
+
+  // sound waves
+  ctx.strokeStyle = 'rgba(125,211,252,0.5)'; ctx.lineWidth = 2;
+  for (let i = 0; i < 3; i++) {
+    const r = 20 + ((t * 60 + i * 25) % 70);
+    ctx.globalAlpha = 1 - r / 90;
+    ctx.beginPath(); ctx.arc(cx - 70, cy, r, -0.6, 0.6); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // diaphragm (vibrating vertical line)
+  const disp = Math.sin(t * 5) * 8;
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(cx + disp, cy - 55); ctx.lineTo(cx + disp, cy + 55);
+  ctx.stroke();
+
+  // backplate (fixed, dotted)
+  ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 4;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(cx + 40, cy - 55); ctx.lineTo(cx + 40, cy + 55); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.font = '600 12px sans-serif'; ctx.fillStyle = '#cfe0ff'; ctx.textAlign = 'center';
+  ctx.fillText('diaphragm', cx + disp, cy - 65);
+  ctx.fillText('backplate', cx + 40, cy + 75);
+
+  // PDM bitstream output
+  ctx.textAlign = 'left';
+  const bits = [1,0,1,1,0,1,0,0,1,1,0,1];
+  const bitW = 14;
+  const startX = w * 0.58;
+  ctx.font = '700 13px monospace';
+  for (let i = 0; i < bits.length; i++) {
+    const idx = (Math.floor(t * 4) + i) % bits.length;
+    ctx.fillStyle = bits[idx] ? '#ffe9a8' : '#465066';
+    ctx.fillRect(startX + i * bitW, h * 0.72, bitW - 3, 16 * (bits[idx] ? 1 : 0.5) + 4);
+  }
+  ctx.fillStyle = '#cfe0ff'; ctx.font = '600 12px sans-serif';
+  ctx.fillText('PDM digital output', startX, h * 0.68);
+
+  const ledX = w * 0.85, ledY = h * 0.28;
+  drawWire(ctx, [[cx + 40, cy], [w * 0.7, h * 0.32], [ledX, ledY]], 'rgba(125,211,252,0.5)');
+  drawLED(ctx, ledX, ledY, 14, Math.abs(disp) > 4, '#7dd3fc');
+}
+
+function drawToF(ctx, w, h, t) {
+  ctx.clearRect(0, 0, w, h);
+  const cx = w * 0.22, cy = h * 0.5;
+  const cycle = (t * 0.7) % 1;
+
+  // emitter
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(cx - 12, cy - 30, 24, 60);
+  ctx.font = '600 11px sans-serif'; ctx.fillStyle = '#cfe0ff'; ctx.textAlign = 'center';
+  ctx.fillText('piezo diaphragm', cx, cy - 42);
+
+  // target object
+  const targetX = w * 0.82;
+  ctx.fillStyle = '#7dd3fc';
+  ctx.fillRect(targetX, cy - 40, 14, 80);
+  ctx.fillText('object', targetX + 7, cy - 52);
+
+  // pulse traveling out and back
+  let pulseX, dir;
+  if (cycle < 0.5) { pulseX = cx + (cycle / 0.5) * (targetX - cx); dir = 1; }
+  else { pulseX = targetX - ((cycle - 0.5) / 0.5) * (targetX - cx); dir = -1; }
+
+  ctx.strokeStyle = dir > 0 ? 'rgba(255,233,168,0.8)' : 'rgba(125,211,252,0.85)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = -2; i <= 2; i++) {
+    ctx.moveTo(pulseX, cy + i * 10 - 4);
+    ctx.lineTo(pulseX + 6, cy + i * 10);
+    ctx.lineTo(pulseX, cy + i * 10 + 4);
+  }
+  ctx.stroke();
+
+  const distance = Math.round(20 + Math.abs(Math.sin(t * 0.3)) * 60);
+  ctx.font = '700 15px sans-serif'; ctx.fillStyle = '#fff';
+  ctx.fillText('distance ≈ ' + distance + ' cm', w * 0.5, h * 0.85);
+  ctx.font = '600 12px sans-serif'; ctx.fillStyle = '#cfe0ff';
+  ctx.fillText(cycle < 0.5 ? 'pulse emitted →' : '← echo returning', w * 0.5, h * 0.78);
+
+  const ledX = w * 0.5, ledY = h * 0.18;
+  drawLED(ctx, ledX, ledY, 14, cycle > 0.48 && cycle < 0.56, '#ffe9a8');
+}
+
+function drawAI(ctx, w, h, t) {
+  ctx.clearRect(0, 0, w, h);
+  const cx = w * 0.55, cy = h * 0.52;
+
+  // central chip
+  ctx.fillStyle = '#22314f';
+  ctx.strokeStyle = GOLD; ctx.lineWidth = 2;
+  ctx.fillRect(cx - 55, cy - 40, 110, 80);
+  ctx.strokeRect(cx - 55, cy - 40, 110, 80);
+  ctx.font = '700 13px sans-serif'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  ctx.fillText('AISight', cx, cy - 4);
+  ctx.font = '600 10px sans-serif'; ctx.fillStyle = '#cfe0ff';
+  ctx.fillText('Edge AI', cx, cy + 14);
+
+  // pulsing internal nodes
+  for (let i = 0; i < 5; i++) {
+    const nx = cx - 35 + (i % 3) * 30;
+    const ny = cy - 20 + Math.floor(i / 3) * 24;
+    const glow = (Math.sin(t * 3 + i) * 0.5 + 0.5);
+    ctx.beginPath(); ctx.arc(nx, ny, 3 + glow * 2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,207,92,${0.3 + glow * 0.5})`;
+    ctx.fill();
+  }
+
+  // incoming sensor streams
+  const sources = [
+    { x: w * 0.1, y: h * 0.18, label: 'IMU' },
+    { x: w * 0.1, y: h * 0.5, label: 'TMR' },
+    { x: w * 0.1, y: h * 0.82, label: 'MIC' },
+    { x: w * 0.9, y: h * 0.18, label: 'ToF' }
+  ];
+  ctx.font = '600 11px sans-serif';
+  sources.forEach((s, i) => {
+    const toChip = s.x < cx;
+    ctx.strokeStyle = 'rgba(125,211,252,0.45)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.lineDashOffset = -t * 40;
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(toChip ? cx - 55 : cx + 55, cy - 20 + i * 12);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#cfe0ff'; ctx.textAlign = toChip ? 'left' : 'right';
+    ctx.fillText(s.label, s.x, s.y - 10);
+  });
+
+  // output arrow (local decision, no phone round-trip)
+  ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(cx + 55, cy); ctx.lineTo(cx + 55 + 40, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx + 95, cy); ctx.lineTo(cx + 85, cy - 6); ctx.moveTo(cx + 95, cy); ctx.lineTo(cx + 85, cy + 6); ctx.stroke();
+  ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.font = '700 12px sans-serif';
+  ctx.fillText('Local decision', cx + 40, cy + 26);
+  ctx.font = '600 10px sans-serif'; ctx.fillStyle = '#8ea0c2';
+  ctx.fillText('(no raw data to phone)', cx + 40, cy + 40);
+}
+
+const DRAWERS = { imu: drawIMU, tmr: drawTMR, mic: drawMic, tof: drawToF, ai: drawAI };
+
+function startMechAnimation(cfg) {
+  if (mechRAF) cancelAnimationFrame(mechRAF);
+  if (mechStepTimer) clearInterval(mechStepTimer);
+  const canvas = document.getElementById('g3d-mech-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const draw = DRAWERS[cfg.drawer];
+  const t0 = performance.now();
+
+  let idx = 0;
+  function showStep() {
+    document.getElementById('g3d-step-index').textContent = idx + 1;
+    document.getElementById('g3d-step-text').textContent = cfg.steps[idx];
+    idx = (idx + 1) % cfg.steps.length;
+  }
+  showStep();
+  mechStepTimer = setInterval(showStep, 2800);
+
+  function loop(now) {
+    const t = (now - t0) / 1000;
+    draw(ctx, rect.width, rect.height, t);
+    // subtle pulse on the real 3D marker
+    const marker = chipMarkers.find(m => m.userData.cfg.id === cfg.id);
+    if (marker) {
+      const glow = 0.6 + Math.abs(Math.sin(t * 2.4)) * 0.9;
+      marker.userData.dot.material.emissiveIntensity = glow;
+    }
+    mechRAF = requestAnimationFrame(loop);
+  }
+  mechRAF = requestAnimationFrame(loop);
+}
+
+/* ---------------- Pointer interaction (click / tap on markers) ---------------- */
+function onPointerDown(e) {
+  const p = e.touches ? e.touches[0] : e;
+  downPos = { x: p.clientX, y: p.clientY };
+  downTime = Date.now();
+}
+function onPointerUp(e) {
+  if (!downPos) return;
+  const p = e.changedTouches ? e.changedTouches[0] : e;
+  const dx = p.clientX - downPos.x, dy = p.clientY - downPos.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const dt = Date.now() - downTime;
+  downPos = null;
+  if (dist > 12 || dt > 500) return;
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((p.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((p.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(chipMarkers, true);
+  if (hits.length) {
+    const chip = findChip(hits[0].object);
+    if (chip) selectChip(chip.userData.cfg.id, true);
+  }
+}
+
+/* ---------------- Init / lifecycle ---------------- */
+function onResize() {
+  if (!container || !renderer) return;
+  const w = container.clientWidth || 400, h = container.clientHeight || 380;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (!container || container.offsetParent === null) return; // paused while hidden
+  controls.update();
+  chipMarkers.forEach(m => {
+    if (m.userData.cfg.id !== currentChipId) {
+      m.userData.dot.material.emissiveIntensity = 0.6 + Math.sin(performance.now() * 0.003) * 0.25;
+    }
+  });
+  renderer.render(scene, camera);
+}
+
+window.initGlassesScene = function () {
+  container = document.getElementById('glasses-canvas-container');
+  if (!container) return;
+
+  if (initialized) { onResize(); return; }
+  initialized = true;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x0a0e1a, 5, 11);
+
+  camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
+  camera.position.copy(HOME_POS);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.copy(HOME_TARGET);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.enablePan = false;
+  controls.minDistance = 1.8;
+  controls.maxDistance = 6.5;
+  controls.rotateSpeed = 0.6;
+  controls.zoomSpeed = 0.8;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.6;
+  controls.update();
+  controls.addEventListener('start', () => { controls.autoRotate = false; });
+
+  scene.add(new THREE.AmbientLight(0x2a355f, 1.0));
+  const key = new THREE.DirectionalLight(0xffffff, 1.3);
+  key.position.set(3, 5, 4);
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0x4a6ee0, 0.6);
+  rim.position.set(-4, 2, -3);
+  scene.add(rim);
+
+  const glasses = buildGlassesModel();
+  scene.add(glasses);
+  buildMarkers();
+  buildLegend();
+
+  raycaster = new THREE.Raycaster();
+  pointer = new THREE.Vector2();
+  renderer.domElement.addEventListener('mousedown', onPointerDown);
+  renderer.domElement.addEventListener('mouseup', onPointerUp);
+  renderer.domElement.addEventListener('touchstart', onPointerDown, { passive: true });
+  renderer.domElement.addEventListener('touchend', onPointerUp, { passive: true });
+
+  document.getElementById('g3d-zoom-in').addEventListener('click', () => {
+    const d = camera.position.distanceTo(controls.target);
+    const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(dir, Math.max(controls.minDistance, d * 0.82));
+    controls.update();
+  });
+  document.getElementById('g3d-zoom-out').addEventListener('click', () => {
+    const d = camera.position.distanceTo(controls.target);
+    const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+    camera.position.copy(controls.target).addScaledVector(dir, Math.min(controls.maxDistance, d * 1.22));
+    controls.update();
+  });
+  document.getElementById('g3d-reset').addEventListener('click', () => {
+    currentChipId = null;
+    updateLegendActive(null);
+    document.getElementById('glasses-panel').innerHTML = '<div class="g3d-placeholder">Select a highlighted sensor on the glasses (or from the list below) to view its role and physical-to-electrical mechanism.</div>';
+    if (mechRAF) cancelAnimationFrame(mechRAF);
+    if (mechStepTimer) clearInterval(mechStepTimer);
+    goHome();
+  });
+
+  window.addEventListener('resize', onResize);
+  onResize();
+  animate();
+};
+</script>
+
+</body>
+</html>
